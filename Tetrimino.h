@@ -1,24 +1,14 @@
 #ifndef TETRIMINO_H
 #define TETRIMINO_H
+#include "Shape.h"
 
-#include <SFML/Graphics.hpp>
-#include <vector>
+class Tetrimino : public Shape {
+protected:
+    int x, y;
 
-class Tetrimino {
-    private:
-    int type;
-    int shape;
-    int x;
-    int y;
-    sf::Color color;
 public:
-    Tetrimino(int type, int shape, int x, int y, sf::Color color);
-
-    void rotate();
-    void setPosition(int x, int y);
-    int getX() const;
-    int getY() const;
-    std::vector<sf::Vector2i> getShape() const;
+    Tetrimino(int startX, int startY);
+    void draw() override = 0;
 };
 
 #endif 
