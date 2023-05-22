@@ -1,71 +1,104 @@
 #include "Game.h"
+#include "Board.h"
+Game::Game()
+    : window(sf::VideoMode(800, 600), "Tetris"),
+      timer(0.0f),
+      timerStep(0.5f),
+      gameOver(false),
+      board(10, 20),
+      currentBlock(0, 0, sf::Color::Cyan),  // 提供初始位置和颜色
+      nextBlock(0, 0, sf::Color::Cyan) {    // 提供初始位置和颜色
+    // 构造函数的其他初始化操作
+}
 
-Game::Game() {
-    // Initialize your attributes here
-    window(sf::VideoMode(800, 600), "Tetris Game"), // Creates a window with size 800x600 pixels and title "Tetris Game"
-    board(), // Default constructor of Board
-    currentBlockgroup(), // Default constructor of Tetrimino
-    nextBlockgroup(), // Default constructor of Tetrimino
-    timer(0.0f), // Initialize timer with 0.0
-    timerStep(1.0f), // Initialize timerStep with 1.0
-    gameOver(false) // Initialize gameOver with false
-
+    // 设置方块的初始位置和颜色
+    currentBlock = Tetrimino(4, 0, sf::Color::Cyan);
+    nextBlock = Tetrimino(4, 0, sf::Color::Cyan);
 }
 
 void Game::run() {
-    // Implementation of run
-    while (window.isOpen){
-    dealingEvent();
-    if (!gameOver){
-    update();
-    }
-    render();
-    if(gameOver){
-    // Game over
-    
+    while (window.isOpen()) {
+        processEvents();
+        update();
+        render();
     }
 }
 
-void Game::dealingEvent() {
-    // Implementation of dealingEvent
+void Game::processEvents() {
     sf::Event event;
     while (window.pollEvent(event)) {
-        switch (event.type) {
-            // Close window: exit
-            case sf::Event::Closed:
-                window.close();
-                break;
-
-            // Key pressed
-            case sf::Event::KeyPressed:
-                switch (event.key.code) {
-                    case sf::Keyboard::Up:
-                        // Rotate the current tetrimino
-                        break;
-                    case sf::Keyboard::Down:
-                        // Move the current tetrimino down faster
-                        break;
-                    case sf::Keyboard::Left:
-                        // Move the current tetrimino left
-                        break;
-                    case sf::Keyboard::Right:
-                        // Move the current tetrimino right
-                        break;
-                    // Add more cases for other keys if needed
-                }
-                break;
-
-            // Add more cases for other event types if needed
+        if (event.type == sf::Event::Closed) {
+            window.close();
+        } else if (event.type == sf::Event::KeyPressed) {
+            handleKeyPress(event.key.code);
         }
     }
 }
 
-}
-
 void Game::update() {
-    // Implementation of update
+    float deltaTime = clock.restart().asSeconds();
+    timer += deltaTime;
+
+    // 更新方块的下落
+    if (timer >= timerStep) {
+        currentBlock.move(0, 1);
+
+        // 检查是否发生碰撞
+        if (board.isCollision(currentBlock)) {
+            currentBlock.move(0, -1);
+
+            // 将当前方块放置到游戏面板上
+            board.placeTetrimino(currentBlock);
+
+            // 消除满行
+            board.removeFullLines();
+
+            // 设置下一个方块
+            currentBlock = nextBlock;
+            nextBlock = Tetrimino(4, 0, sf::Color::Cyan);
+
+            // 检查游戏是否结束
+            if (board.isCollision(currentBlock)) {
+                gameOver = true;
+            }
+        }
+
+        timer = 0.0f;
+    }
 }
 
 void Game::render() {
-    // Implementation of render
+    window.clear();
+
+    // 绘制游戏界面
+    board.draw(window);
+    currentBlock.draw(window);
+
+    window.display();
+}
+
+void Game::handleKeyPress(sf::Keyboard::Key key) {
+    if (key == sf::Keyboard::Left) {
+        currentBlock.move(-1, 0);
+        if (board.isCollision(currentBlock)) {
+            currentBlock.move(1, 0);
+        }
+    } else if (key == sf::Keyboard::Right) {
+        currentBlock.move(1, 0);
+        if (board.isCollision(currentBlock)) {
+            currentBlock.move(-1, 0);
+        }
+    } else if (key == sf::Keyboard::Down) {
+        currentBlock.move(0, 1);
+        if (board.isCollision(currentBlock)) {
+            currentBlock.move(0, -1);
+        }
+    } else if (key == sf::Keyboard::Up) {
+        currentBlock.rotate();
+        if (board.isCollision(currentBlock)) {
+            currentBlock.rotate();
+            currentBlock.rotate();
+            currentBlock.rotate();
+        }
+    }
 }

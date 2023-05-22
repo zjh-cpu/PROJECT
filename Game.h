@@ -2,25 +2,32 @@
 #define GAME_H
 
 #include <SFML/Graphics.hpp>
-#include "Board.h"
 #include "Tetrimino.h"
+#include "Board.h"
 
 class Game {
-    private:
+public:
+    Game();
+
+    void run();
+
+private:
     sf::RenderWindow window;
+    sf::Clock clock;
+    sf::Time timeSinceLastUpdate;
+    sf::Time timePerFrame;
     Board board;
-    Tetrimino currentBlockgroup;
-    Tetrimino nextBlockgroup;
     float timer;
     float timerStep;
     bool gameOver;
-    
-public:
-    Game();
-    void run();
-    void dealingEvent();
+
+    Tetrimino currentBlock;
+    Tetrimino nextBlock;
+
+    void processEvents();
     void update();
-    void render();   
+    void render();
+    void handleKeyPress(sf::Keyboard::Key key);
 };
 
 #endif

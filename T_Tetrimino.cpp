@@ -1,9 +1,7 @@
 #include "T_Tetrimino.h"
 
-T_Tetrimino::T_Tetrimino(int startX, int startY) : Tetrimino(startX, startY) {
-   
+void T_Tetrimino::rotate() {
+    // ...实现旋转...
 }
 
-void T_Tetrimino::draw() {
- 
-}
+// ...其他方法实现...
